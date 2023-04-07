@@ -35,7 +35,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
         httpSecurity.cors().and().csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/user/register").anonymous()
+                .requestMatchers(HttpMethod.POST, "/api/v1/user/login").anonymous()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
