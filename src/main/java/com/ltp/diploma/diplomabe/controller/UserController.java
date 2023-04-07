@@ -1,8 +1,10 @@
 package com.ltp.diploma.diplomabe.controller;
 
+import com.ltp.diploma.diplomabe.model.dto.JWTResponseDto;
 import com.ltp.diploma.diplomabe.model.dto.UserRegistrationRequestDto;
 import com.ltp.diploma.diplomabe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -20,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/register", consumes = {APPLICATION_JSON_VALUE})
-    public Long register(@RequestBody UserRegistrationRequestDto userRegistrationRequestDto){
+    public JWTResponseDto register(@RequestBody UserRegistrationRequestDto userRegistrationRequestDto){
         return userService.register(userRegistrationRequestDto);
     }
 }

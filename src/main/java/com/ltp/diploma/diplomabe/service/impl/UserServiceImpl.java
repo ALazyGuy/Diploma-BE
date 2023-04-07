@@ -1,9 +1,13 @@
 package com.ltp.diploma.diplomabe.service.impl;
 
 import com.ltp.diploma.diplomabe.entity.UserEntity;
+import com.ltp.diploma.diplomabe.exception.ConflictException;
+import com.ltp.diploma.diplomabe.model.UserDetailsImpl;
+import com.ltp.diploma.diplomabe.model.dto.JWTResponseDto;
 import com.ltp.diploma.diplomabe.model.dto.UserRegistrationRequestDto;
 import com.ltp.diploma.diplomabe.repository.UserRepository;
 import com.ltp.diploma.diplomabe.service.UserService;
+import com.ltp.diploma.diplomabe.util.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +24,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long register(final UserRegistrationRequestDto userRegistrationRequest) {
+    public JWTResponseDto register(final UserRegistrationRequestDto userRegistrationRequest) {
         final UserEntity userEntity = new UserEntity();
         if(userRepository.existsByUsername(userRegistrationRequest.getUsername())){
-            return -1L;
+            throw new ConflictException();
         }
         userEntity.setUsername(userRegistrationRequest.getUsername());
         userEntity.setPassword_hash(passwordEncoder.encode(userRegistrationRequest.getPassword()));
-        return userRepository.save(userEntity).getId();
+        userRepository.save(userEntity);
+
+        return new JWTResponseDto(JWTUtils.generate(new UserDetailsImpl(userEntity)));
     }
 }
