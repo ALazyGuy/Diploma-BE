@@ -21,8 +21,9 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/register", consumes = {APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/register", consumes = {APPLICATION_JSON_VALUE}, produces = {APPLICATION_JSON_VALUE})
     public JWTResponseDto register(@RequestBody UserRegistrationRequestDto userRegistrationRequestDto){
         return userService.register(userRegistrationRequestDto);
     }
+
 }
