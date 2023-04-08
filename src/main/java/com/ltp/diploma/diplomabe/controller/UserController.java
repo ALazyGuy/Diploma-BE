@@ -1,6 +1,7 @@
 package com.ltp.diploma.diplomabe.controller;
 
 import com.ltp.diploma.diplomabe.model.dto.JWTResponseDto;
+import com.ltp.diploma.diplomabe.model.dto.UserInfoResponseDto;
 import com.ltp.diploma.diplomabe.model.dto.UserLoginRequestDto;
 import com.ltp.diploma.diplomabe.model.dto.UserRegistrationRequestDto;
 import com.ltp.diploma.diplomabe.service.UserService;
@@ -30,6 +31,11 @@ public class UserController {
     @PostMapping(value = "/login", consumes = {APPLICATION_JSON_VALUE}, produces = {APPLICATION_JSON_VALUE})
     public JWTResponseDto login(@RequestBody UserLoginRequestDto userLoginRequestDto){
         return userService.login(userLoginRequestDto);
+    }
+
+    @GetMapping(value = "/info", produces = {APPLICATION_JSON_VALUE})
+    public UserInfoResponseDto info(){
+        return userService.info();
     }
 
 }

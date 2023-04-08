@@ -5,12 +5,15 @@ import com.ltp.diploma.diplomabe.exception.ConflictException;
 import com.ltp.diploma.diplomabe.exception.InvalidCredentialsException;
 import com.ltp.diploma.diplomabe.model.UserDetailsImpl;
 import com.ltp.diploma.diplomabe.model.dto.JWTResponseDto;
+import com.ltp.diploma.diplomabe.model.dto.UserInfoResponseDto;
 import com.ltp.diploma.diplomabe.model.dto.UserLoginRequestDto;
 import com.ltp.diploma.diplomabe.model.dto.UserRegistrationRequestDto;
 import com.ltp.diploma.diplomabe.repository.UserRepository;
 import com.ltp.diploma.diplomabe.service.UserService;
 import com.ltp.diploma.diplomabe.util.JWTUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +54,11 @@ public class UserServiceImpl implements UserService {
         }
 
         return new JWTResponseDto(JWTUtils.generate(new UserDetailsImpl(userEntity)));
+    }
+
+    @Override
+    public UserInfoResponseDto info() {
+        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return new UserInfoResponseDto(username);
     }
 }
