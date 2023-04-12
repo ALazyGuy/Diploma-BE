@@ -1,13 +1,12 @@
 package com.ltp.diploma.diplomabe.service.impl;
 
+import com.ltp.diploma.diplomabe.entity.TestEntity;
 import com.ltp.diploma.diplomabe.entity.UserEntity;
 import com.ltp.diploma.diplomabe.exception.ConflictException;
 import com.ltp.diploma.diplomabe.exception.InvalidCredentialsException;
 import com.ltp.diploma.diplomabe.model.UserDetailsImpl;
-import com.ltp.diploma.diplomabe.model.dto.JWTResponseDto;
-import com.ltp.diploma.diplomabe.model.dto.UserInfoResponseDto;
-import com.ltp.diploma.diplomabe.model.dto.UserLoginRequestDto;
-import com.ltp.diploma.diplomabe.model.dto.UserRegistrationRequestDto;
+import com.ltp.diploma.diplomabe.model.dto.*;
+import com.ltp.diploma.diplomabe.repository.TestRepository;
 import com.ltp.diploma.diplomabe.repository.UserRepository;
 import com.ltp.diploma.diplomabe.service.UserService;
 import com.ltp.diploma.diplomabe.util.JWTUtils;
@@ -17,15 +16,22 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final TestRepository testRepository;
     private final PasswordEncoder passwordEncoder;
     @Autowired
-    public UserServiceImpl(final UserRepository userRepository, final PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(final UserRepository userRepository, final PasswordEncoder passwordEncoder,
+                           final TestRepository testRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.testRepository = testRepository;
     }
 
     @Override
@@ -61,4 +67,35 @@ public class UserServiceImpl implements UserService {
         final String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return new UserInfoResponseDto(username);
     }
+
+    @Override
+    public void saveUserTestResult(final UserTestResultRequestDto userTestResultRequestDto) {
+        final int ticket = userTestResultRequestDto.getTicket();
+        final int result = userTestResultRequestDto.getResult();
+        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        final UserEntity user = userRepository.findByUsername(username).get();
+        final Set<TestEntity> tests = user.getTests();
+        final Optional<TestEntity> optTest = tests.stream().filter(test -> test.getTicket() == ticket).findFirst();
+
+        if(optTest.isEmpty()) {
+            final TestEntity testEntity = new TestEntity();
+            testEntity.setTicket(ticket);
+            testEntity.setResult(result);
+            testRepository.save(testEntity);
+            user.getTests().add(testEntity);
+            userRepository.save(user);
+        } else {
+            final TestEntity testEntity = optTest.get();
+            testEntity.setResult(result);
+            testRepository.save(testEntity);
+            userRepository.save(user);
+        }
+    }
+
+    @Override
+    public Set<TestEntity> loadTests() {
+        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username).get().getTests();
+    }
+
 }

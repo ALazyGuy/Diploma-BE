@@ -1,13 +1,13 @@
 package com.ltp.diploma.diplomabe.controller;
 
-import com.ltp.diploma.diplomabe.model.dto.JWTResponseDto;
-import com.ltp.diploma.diplomabe.model.dto.UserInfoResponseDto;
-import com.ltp.diploma.diplomabe.model.dto.UserLoginRequestDto;
-import com.ltp.diploma.diplomabe.model.dto.UserRegistrationRequestDto;
+import com.ltp.diploma.diplomabe.entity.TestEntity;
+import com.ltp.diploma.diplomabe.model.dto.*;
 import com.ltp.diploma.diplomabe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -36,6 +36,16 @@ public class UserController {
     @GetMapping(value = "/info", produces = {APPLICATION_JSON_VALUE})
     public UserInfoResponseDto info(){
         return userService.info();
+    }
+
+    @PutMapping(value = "/test", consumes = {APPLICATION_JSON_VALUE})
+    public void saveTestResult(@RequestBody UserTestResultRequestDto userTestResultRequestDto){
+        userService.saveUserTestResult(userTestResultRequestDto);
+    }
+
+    @GetMapping(value = "/test", produces = {APPLICATION_JSON_VALUE})
+    public Set<TestEntity> getTests(){
+        return userService.loadTests();
     }
 
 }
