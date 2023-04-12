@@ -13,4 +13,5 @@ public interface UserService {
     UserInfoResponseDto info();
     void saveUserTestResult(UserTestResultRequestDto userTestResultRequestDto);
     Set<TestEntity> loadTests();
+    JWTResponseDto updateUserInfo(UserUpdateRequestDto userUpdateRequestDto);
 }

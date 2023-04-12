@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
         final TestEntity testEntity = new TestEntity();
         testEntity.setTicket(ticket);
         testEntity.setResult(result);
+        testEntity.setDate(LocalDateTime.now());
         testRepository.save(testEntity);
         user.getTests().add(testEntity);
 
@@ -99,6 +100,23 @@ public class UserServiceImpl implements UserService {
     public Set<TestEntity> loadTests() {
         final String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(username).get().getTests();
+    }
+
+    @Override
+    public JWTResponseDto updateUserInfo(final UserUpdateRequestDto userUpdateRequestDto) {
+        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        final UserEntity user = userRepository.findByUsername(username).get();
+
+        if(!userUpdateRequestDto.getUsername().isEmpty() && !userRepository.existsByUsername(userUpdateRequestDto.getUsername())) {
+            user.setUsername(userUpdateRequestDto.getUsername());
+        }
+
+        if(!userUpdateRequestDto.getPassword().isEmpty()) {
+            user.setPassword_hash(passwordEncoder.encode(userUpdateRequestDto.getPassword()));
+        }
+
+        userRepository.save(user);
+        return new JWTResponseDto(JWTUtils.generate(new UserDetailsImpl(user)));
     }
 
 }

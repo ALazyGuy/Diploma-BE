@@ -6,6 +6,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 public class TestEntity {
@@ -15,4 +17,5 @@ public class TestEntity {
     private Long id;
     private int result;
     private int ticket;
+    private LocalDateTime date;
 }
