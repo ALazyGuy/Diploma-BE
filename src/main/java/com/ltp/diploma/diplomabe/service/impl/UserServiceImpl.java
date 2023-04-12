@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TestRepository testRepository;
     private final PasswordEncoder passwordEncoder;
+
     @Autowired
     public UserServiceImpl(final UserRepository userRepository, final PasswordEncoder passwordEncoder,
                            final TestRepository testRepository) {
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public JWTResponseDto register(final UserRegistrationRequestDto userRegistrationRequest) {
         final UserEntity userEntity = new UserEntity();
-        if(userRepository.existsByUsername(userRegistrationRequest.getUsername())){
+        if (userRepository.existsByUsername(userRegistrationRequest.getUsername())) {
             throw new ConflictException();
         }
         userEntity.setUsername(userRegistrationRequest.getUsername());
@@ -49,13 +51,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public JWTResponseDto login(final UserLoginRequestDto userLoginRequestDto) {
-        if(!userRepository.existsByUsername(userLoginRequestDto.getUsername())){
+        if (!userRepository.existsByUsername(userLoginRequestDto.getUsername())) {
             throw new InvalidCredentialsException();
         }
 
         final UserEntity userEntity = userRepository.findByUsername(userLoginRequestDto.getUsername()).get();
 
-        if(!passwordEncoder.matches(userLoginRequestDto.getPassword(), userEntity.getPassword_hash())){
+        if (!passwordEncoder.matches(userLoginRequestDto.getPassword(), userEntity.getPassword_hash())) {
             throw new InvalidCredentialsException();
         }
 
@@ -75,21 +77,22 @@ public class UserServiceImpl implements UserService {
         final String username = SecurityContextHolder.getContext().getAuthentication().getName();
         final UserEntity user = userRepository.findByUsername(username).get();
         final Set<TestEntity> tests = user.getTests();
-        final Optional<TestEntity> optTest = tests.stream().filter(test -> test.getTicket() == ticket).findFirst();
 
-        if(optTest.isEmpty()) {
-            final TestEntity testEntity = new TestEntity();
-            testEntity.setTicket(ticket);
-            testEntity.setResult(result);
-            testRepository.save(testEntity);
-            user.getTests().add(testEntity);
-            userRepository.save(user);
-        } else {
-            final TestEntity testEntity = optTest.get();
-            testEntity.setResult(result);
-            testRepository.save(testEntity);
-            userRepository.save(user);
+        if(tests.size() == 10) {
+            final TestEntity first = tests.stream()
+                    .sorted((t1, t2) -> t1.getId() < t2.getId() ? -1 : 1)
+                    .findFirst().get();
+            user.getTests().remove(first);
+            testRepository.delete(first);
         }
+
+        final TestEntity testEntity = new TestEntity();
+        testEntity.setTicket(ticket);
+        testEntity.setResult(result);
+        testRepository.save(testEntity);
+        user.getTests().add(testEntity);
+
+        userRepository.save(user);
     }
 
     @Override
