@@ -14,4 +14,5 @@ public interface UserService {
     void saveUserTestResult(UserTestResultRequestDto userTestResultRequestDto);
     Set<TestEntity> loadTests();
     JWTResponseDto updateUserInfo(UserUpdateRequestDto userUpdateRequestDto);
+    void deleteUser();
 }

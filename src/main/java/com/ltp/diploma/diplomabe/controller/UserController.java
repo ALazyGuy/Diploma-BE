@@ -12,7 +12,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@CrossOrigin(origins = "*", methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.OPTIONS})
+@CrossOrigin(origins = "*", methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class UserController {
 
     private final UserService userService;
@@ -50,6 +50,11 @@ public class UserController {
     @PutMapping(value = "/update", consumes = {APPLICATION_JSON_VALUE}, produces = {APPLICATION_JSON_VALUE})
     public JWTResponseDto updateUserInfo(@RequestBody UserUpdateRequestDto userUpdateRequestDto){
         return userService.updateUserInfo(userUpdateRequestDto);
+    }
+
+    @DeleteMapping("/user")
+    public void deleteUser(){
+        userService.deleteUser();
     }
 
 }

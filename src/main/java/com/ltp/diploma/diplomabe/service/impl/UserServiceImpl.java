@@ -119,4 +119,10 @@ public class UserServiceImpl implements UserService {
         return new JWTResponseDto(JWTUtils.generate(new UserDetailsImpl(user)));
     }
 
+    @Override
+    public void deleteUser() {
+        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        final UserEntity user = userRepository.findByUsername(username).get();
+        userRepository.delete(user);
+    }
 }
